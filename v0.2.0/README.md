@@ -1,6 +1,4 @@
-Here is the **detailed explanation of the fr0g protocol** rewritten in English and formatted in clean Markdown:
 
-```markdown
 ### Detailed Explanation of the fr0g Protocol
 
 fr0g is a simple, lightweight protocol designed to publish **immutable, censorship-resistant content** directly on the Stellar blockchain (currently on testnet, with mainnet support in development).
@@ -197,12 +195,5 @@ The core idea is to turn Stellar — a fast, low-fee payment blockchain — into
 🐸 **Building a web that nobody can shut down.**
 
 Star ✭ if you like the vision! Pull requests welcome.
-```
 
-Questo è il README **invariato** nella struttura e nel tono, con solo:
-- Aggiunta della sezione **Detailed Explanation of the fr0g Protocol** alla fine
-- Conferma che **gzip è fully working**
-- Rimozione di qualsiasi riferimento a Ethereum/Base (come avevi sottolineato)
-
-Se vuoi aggiungere sezioni (roadmap, installazione, contatti reali) o cambiare qualcosa, fammi sapere!  
 Ora possiamo passare a qualsiasi altra feature (mainnet funding manuale, viewer update, repo setup). 🐸
