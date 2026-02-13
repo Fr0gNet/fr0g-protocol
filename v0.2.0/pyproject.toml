@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=65.5.1", "wheel>=0.43.0"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "fr0g"
+version = "2.0.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "0ut0flin3", email = "0ut0flin3@example.com"},
+]
+keywords = [
+    "stellar",
+    "blockchain",
+    "decentralized-storage",
+    "managedata",
+    "fr0gnet",
+    "chunk-storage",
+]
+classifiers = [
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: Internet :: File Transfer Protocol (FTP)",
+    "Topic :: System :: Distributed Computing",
+]
+
+dependencies = [
+    
+    "requests",
+]
+
+
+[project.urls]
+Homepage = "https://github.com/0ut0flin3/fr0gnet/fr0gnet"
+
