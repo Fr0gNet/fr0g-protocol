@@ -144,7 +144,7 @@ def keypair_from_seed(seed):
     secret = strkey_encode(VERSION_BYTE_SECRET_SEED, seed)
     public_key = strkey_encode(VERSION_BYTE_ACCOUNT_ID, vk)
     return public_key, secret
-def enable_id(fr0g_id,fr0g_secret,airdrop_only=False):
+def enable_id(fr0g_id,fr0g_secret=None,airdrop_only=False):
     address=fr0g_id[4:][::-1].upper()
     url = f"https://friendbot.stellar.org?addr={address}"
     headers = {
@@ -495,9 +495,11 @@ def account_exists(address: str) -> bool:
     except Exception as e:
         print(colors.RED + f"Error checking account existence {address}: {str(e)}" + colors.END)
         return False
-def upload(inp: bytes, fr0g_secret: str, index: int | str = 0, make_discoverable: bool = True) -> List[str]:
+def upload(inp: bytes, fr0g_secret: str, index: int | str = 0, make_discoverable: bool = True,description:str=None) -> List[str]:
     if not inp:
         raise ValueError("Empty content")
+    if description!=None and len(description)>25:
+       raise "Error: Description max length exceeded (max 25 characters)"
     mime_type = guess_mime_type(inp)
     print(colors.BLUE + f"Type: {mime_type}" + colors.END)
     current_secret = fr0g_secret
@@ -601,9 +603,14 @@ def upload(inp: bytes, fr0g_secret: str, index: int | str = 0, make_discoverable
     print(colors.GREEN + f"Upload completed. Total accounts used: {len(all_ids)}" + colors.END)
 ######################################################à
     if make_discoverable:
+       text=str(target_index)
+       if description==None:
+          pass
+       else:
+            text=str(target_index)+";"+description
        indexer_id=get_indexerID_from_mimetype(mime_type)
        print("guessed category id: "+indexer_id)
-       send_text_memo(str(target_index),fr0gID2stellar(indexer_id),fr0gsecret2stellar(fr0g_secret))
+       send_text_memo(text,fr0gID2stellar(indexer_id),fr0gsecret2stellar(fr0g_secret))
 ###############################################
     return all_ids
 def get_mime_type(fr0g_id: str, file_index: int = 0) -> Optional[str]:
