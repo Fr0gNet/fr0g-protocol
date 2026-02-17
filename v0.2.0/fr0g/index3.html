@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ribbit – Real Content Feed</title>
+  <meta name="description" content="Ribbit is a community feed of real content uploaded to the fr0g protocol on Stellar. Discover and view uploads with descriptions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --text: #e2e8f0;
+      --text2: #94a3b8;
+      --accent: #60a5fa;
+      --border: #1e293b;
+      --card: #111827;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.55;
+      font-size: 16px;
+      padding: 1rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      padding: 2.5rem 0 2rem;
+    }
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+    .tagline {
+      color: var(--text2);
+      font-size: 1.05rem;
+      margin-bottom: 0.8rem;
+    }
+    .links a {
+      color: var(--accent);
+      text-decoration: none;
+      margin: 0 0.9rem;
+    }
+    .links a:hover { text-decoration: underline; }
+    main { margin-top: 1rem; }
+    .item {
+      margin-bottom: 2.2rem;
+      padding-bottom: 1.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .item:last-child { border-bottom: none; margin-bottom: 3rem; }
+    .title {
+      font-size: 1.38rem;
+      font-weight: 600;
+      line-height: 1.38;
+      margin-bottom: 0.45rem;
+      color: var(--text);
+    }
+    .title a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .title a:hover { color: var(--accent); text-decoration: underline; }
+    .meta {
+      font-size: 0.92rem;
+      color: var(--text2);
+      margin-bottom: 0.6rem;
+    }
+    .meta span:not(:last-child):after {
+      content: " • ";
+      color: var(--border);
+      margin: 0 0.35rem;
+    }
+    .description {
+      font-size: 1.06rem;
+      line-height: 1.58;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      word-break: break-word;
+    }
+    .loading, .empty {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text2);
+      font-size: 1.1rem;
+    }
+    .popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .popup-content {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 960px;
+      max-height: 92vh;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(0,0,0,0.7);
+    }
+    .popup-header {
+      padding: 1.2rem 1.8rem;
+      background: rgba(96,165,250,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .popup-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+    .close-btn {
+      background: transparent;
+      color: var(--text2);
+      border: 1px solid var(--border);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.6rem;
+      cursor: pointer;
+    }
+    .close-btn:hover { color: #ff3366; border-color: #ff3366; }
+    .popup-body {
+      padding: 1.8rem;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .preview-box {
+      height: 420px;
+      background: #000;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8rem;
+      color: #333;
+    }
+    .preview-box img, .preview-box video {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .preview-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .preview-box pre {
+      color: #0f0;
+      padding: 1rem;
+      height: 100%;
+      overflow: auto;
+      font-family: monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 480px) {
+      body { font-size: 15px; padding: 0.9rem; }
+      h1 { font-size: 2.3rem; }
+      .title { font-size: 1.26rem; }
+      .description { font-size: 1rem; }
+      .preview-box { height: 300px; font-size: 6rem; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Ribbit</h1>
+  <p class="tagline">Community feed of real content on Stellar via fr0g protocol</p>
+  <div class="links">
+    <a href="https://github.com/Fr0gNet" target="_blank">GitHub</a>
+    <a href="https://github.com/Fr0gNet/fr0g-protocol" target="_blank">fr0g-protocol</a>
+  </div>
+</header>
+<main id="main">
+  <div class="loading">Discovering latest uploads…</div>
+</main>
+
+<script>
+// CONFIG
+const HORIZON = "https://horizon-testnet.stellar.org";
+const INDEXERS = {
+  IMAGES: 'fr0gar7b4wscthfrqofckuq22clb3usofiud75gozxe26mqavyisrc5bemcg',
+  VIDEOS: 'fr0gmypk54u3b5zytuzhwdbpxcyems234siebxa5wf2htz62smg4hbrtz5ag',
+  WEBSITES: 'fr0gey3nkjwxfi3olj2opkjwzxg2prjxwyld3rxthfuzqd5ssyzisbr3fcbg',
+  CODE: 'fr0g64n6okdmub2vqiiqmupwdtclsqakkbm3idbaz6c3kliddivpgfeetldg',
+  RAW: 'fr0gcqkdfplmirjr5wxkez75mubdwow3i2ishskhgnesq4iyiishafeef2dg',
+};
+const LIMIT = 200;
+const UPDATE_INTERVAL = 15000;
+
+// === fr0g Library (browser-adapted from official fr0g.js) ===
+function fr0gID2stellar(fr0g_id) {
+  if (!fr0g_id || !fr0g_id.startsWith('fr0g')) return null;
+  return fr0g_id.substring(4).split('').reverse().join('').toUpperCase();
+}
+
+async function retrieveData(fr0gId) {
+  const stellarAddr = fr0gID2stellar(fr0gId);
+  if (!stellarAddr) return [];
+  const url = `${HORIZON}/accounts/${stellarAddr}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    if (response.status === 404) return [];
+    throw new Error(`Failed to fetch account data: ${response.status}`);
+  }
+  const accountInfo = await response.json();
+  const dataEntries = accountInfo.data || {};
+  const result = [];
+  for (const [key, b64Value] of Object.entries(dataEntries)) {
+    const binaryString = atob(b64Value);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    result.push([key, bytes]);
+  }
+  return result;
+}
+
+async function getMimeType(fr0gId, fileIndex = 0) {
+  let currentId = fr0gId;
+  const visited = new Set();
+  while (!visited.has(currentId)) {
+    visited.add(currentId);
+    let dataEntries;
+    try {
+      dataEntries = await retrieveData(currentId);
+    } catch (e) {
+      console.warn(`Failed to retrieve linked ID ${currentId}: ${e.message}`);
+      break;
+    }
+    if (!dataEntries || dataEntries.length === 0) break;
+
+    const entryDict = Object.fromEntries(dataEntries);
+
+    for (const [key] of dataEntries) {
+      if (!key.startsWith(`fr0g:f${fileIndex}c`)) continue;
+      try {
+        const cSplit = key.split('c', 2);
+        if (cSplit.length < 2) continue;
+        const rest = cSplit[1];
+        const colonSplit = rest.split(':', 2);
+        if (colonSplit.length < 2) continue;
+        const chunkNumStr = colonSplit[0];
+        const mimeCandidate = colonSplit[1].trim();
+        if (/^\d+$/.test(chunkNumStr) && mimeCandidate) {
+          return mimeCandidate;
+        }
+      } catch (e) { continue; }
+    }
+
+    const nextKey = `fr0g:next_f${fileIndex}`;
+    if (nextKey in entryDict) {
+      let nextId = entryDict[nextKey];
+      if (nextId instanceof Uint8Array) {
+        nextId = new TextDecoder().decode(nextId).trim();
+      } else if (typeof nextId === 'string') {
+        nextId = nextId.trim();
+      }
+      if (nextId.startsWith('fr0g') && nextId !== currentId) {
+        currentId = nextId;
+        continue;
+      }
+    } else {
+      break;
+    }
+  }
+  return null;
+}
+
+function concatUint8Arrays(arrays) {
+  let totalLength = arrays.reduce((sum, arr) => sum + arr.length, 0);
+  let result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const arr of arrays) {
+    result.set(arr, offset);
+    offset += arr.length;
+  }
+  return result;
+}
+
+async function getC(id, index = 0) {
+  let retrieve;
+  try {
+    retrieve = await retrieveData(id);
+  } catch (e) {
+    console.error(`Failed to retrieve ${id}: ${e.message}`);
+    return [null, null];
+  }
+
+  const chunks = [];
+  for (const [key, valueBytes] of retrieve) {
+    if (!key.startsWith(`fr0g:f${index}c`)) continue;
+    try {
+      const cSplit = key.split('c', 2);
+      if (cSplit.length < 2) continue;
+      const rest = cSplit[1];
+      const colonSplit = rest.split(':', 2);
+      const chunkNumStr = colonSplit[0];
+      if (!/^\d+$/.test(chunkNumStr)) continue;
+      const chunkNum = parseInt(chunkNumStr, 10);
+      chunks.push([chunkNum, valueBytes]);
+    } catch (e) { continue; }
+  }
+
+  if (chunks.length === 0) return [null, null];
+
+  chunks.sort((a, b) => a[0] - b[0]);
+  let full = concatUint8Arrays(chunks.map(([, val]) => val));
+
+  // Trim trailing 0xFF padding
+  while (full.length > 0 && full[full.length - 1] === 0xFF) {
+    full = full.slice(0, -1);
+  }
+
+  // MIME (library always uses file index 0 for MIME lookup)
+  let mime = await getMimeType(id) || 'application/octet-stream';
+  const isGzipped = mime.includes('+gzip');
+  const mimeClean = mime.replace('+gzip', '').trim();
+
+  if (isGzipped) {
+    try {
+      const ds = new DecompressionStream('gzip');
+      const stream = new Response(full).body.pipeThrough(ds);
+      const reader = stream.getReader();
+      let decompressed = new Uint8Array();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const newArr = new Uint8Array(decompressed.length + value.length);
+        newArr.set(decompressed);
+        newArr.set(value, decompressed.length);
+        decompressed = newArr;
+      }
+      full = decompressed;
+    } catch (e) {
+      console.error(`Gzip decompress failed: ${e.message}`);
+      return [null, null];
+    }
+  }
+  return [full, mimeClean];
+}
+
+// Legacy alias for feed code
+const fr0gToStellar = fr0gID2stellar;
+
+// Time ago
+function timeAgo(date) {
+  const seconds = Math.floor((Date.now() - new Date(date)) / 1000);
+  const intervals = [
+    { d: 31536000, l: "y" }, { d: 2592000, l: "mo" },
+    { d: 86400, l: "d" }, { d: 3600, l: "h" }, { d: 60, l: "m" }
+  ];
+  for (const i of intervals) {
+    const v = Math.floor(seconds / i.d);
+    if (v >= 1) return v + i.l + " ago";
+  }
+  return "just now";
+}
+
+// Parse memo: number[;description]
+function parseMemo(text) {
+  text = text.trim();
+  if (!text) return null;
+  const parts = text.split(";");
+  const numStr = parts[0].trim();
+  if (!/^\d+$/.test(numStr)) return null;
+  return {
+    index: parseInt(numStr, 10),
+    desc: parts.length > 1 ? parts.slice(1).join(";").trim() : "No description provided for this content"
+  };
+}
+
+// Fetch memos from indexer transactions
+async function fetchIndexerMemos(fr0gId) {
+  const addr = fr0gToStellar(fr0gId);
+  if (!addr) return [];
+  const url = `${HORIZON}/accounts/${addr}/transactions?order=desc&limit=${LIMIT}&include_failed=false`;
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return [];
+    const json = await r.json();
+    const items = [];
+    for (const tx of json._embedded.records || []) {
+      if (tx.memo_type !== "text") continue;
+      const parsed = parseMemo(tx.memo);
+      if (!parsed) continue;
+      items.push({
+        index: parsed.index,
+        description: parsed.desc,
+        uploader: "fr0g" + tx.source_account.split("").reverse().join("").toLowerCase(),
+        time: tx.created_at,
+        txHash: tx.hash,
+        category: Object.keys(INDEXERS).find(k => INDEXERS[k] === fr0gId) || "Other"
+      });
+    }
+    return items.sort((a,b) => new Date(b.time) - new Date(a.time));
+  } catch (err) {
+    return [];
+  }
+}
+
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// Render feed item
+function renderItem(item) {
+  const div = document.createElement("div");
+  div.className = "item";
+  const safeDesc = item.description.replace(/'/g, "\\'").replace(/"/g, '\\"');
+  div.innerHTML = `
+    <div class="title">
+      <a href="#" onclick="openPopup('${item.uploader}', ${item.index}, '${safeDesc}', '${item.txHash}', '${item.category}'); return false;">
+        ${item.description}
+      </a>
+    </div>
+    <div class="meta">
+      <span>by ${item.uploader.slice(0,12)}…#${item.index}</span>
+      <span>${timeAgo(item.time)}</span>
+      <span>Type: ${item.category}</span>
+      <span>
+        <a href="https://horizon-testnet.stellar.org/transactions/${item.txHash}" target="_blank" rel="noopener">
+          tx
+        </a>
+      </span>
+    </div>
+  `;
+  return div;
+}
+
+// Open popup with REAL content using fr0g getC()
+async function openPopup(uploader, index, desc, txHash, category) {
+  const popup = document.createElement("div");
+  popup.className = "popup";
+  popup.style.display = "flex";
+  popup.innerHTML = `
+    <div class="popup-content">
+      <div class="popup-header">
+        <h2 class="popup-title">${desc}</h2>
+        <button class="close-btn" onclick="this.closest('.popup').remove()">×</button>
+      </div>
+      <div class="popup-body">
+        <div class="preview-box" id="previewBox">
+          Downloading real content...
+        </div>
+        <div style="margin-top:1.5rem;line-height:1.6;font-size:1.05rem;">
+          <strong>Uploader:</strong> ${uploader}<br>
+          <strong>Index:</strong> ${index}<br>
+          <strong>Description:</strong><br>${desc}<br><br>
+          <strong>Discovered:</strong> ${timeAgo(new Date())}<br>
+          <strong>Type / MIME:</strong> <span id="mimeInfo">Loading...</span><br>
+          <strong>Size:</strong> <span id="sizeInfo">Calculating...</span><br>
+          <strong>Tx:</strong> <a href="https://horizon-testnet.stellar.org/transactions/${txHash}" target="_blank">${txHash.slice(0,12)}...</a>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(popup);
+
+  const previewBox = popup.querySelector("#previewBox");
+  const mimeInfo = popup.querySelector("#mimeInfo");
+  const sizeInfo = popup.querySelector("#sizeInfo");
+
+  try {
+    const [data, mime] = await getC(uploader, index);
+    if (!data) throw new Error("No content found");
+
+    const mimeClean = mime || "application/octet-stream";
+    const size = data.length;
+    mimeInfo.textContent = mimeClean;
+    sizeInfo.textContent = size > 1048576 
+      ? (size / 1048576).toFixed(2) + " MB" 
+      : (size / 1024).toFixed(1) + " KB";
+
+    const blob = new Blob([data], { type: mimeClean });
+    const url = URL.createObjectURL(blob);
+
+    let previewHTML = '';
+    if (mimeClean.startsWith("image/")) {
+      previewHTML = `<img src="${url}" alt="${desc}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+    } else if (mimeClean.startsWith("video/")) {
+      previewHTML = `<video controls autoplay muted loop style="max-width:100%;max-height:100%;object-fit:contain;"><source src="${url}" type="${mimeClean}"></video>`;
+    } else if (mimeClean.includes("html") || mimeClean === "text/html") {
+      previewHTML = `<iframe src="${url}" sandbox="allow-scripts" style="width:100%;height:100%;border:none;"></iframe>`;
+    } else if (mimeClean.startsWith("text/") || mimeClean === "application/json") {
+      const text = new TextDecoder().decode(data);
+      previewHTML = `<pre style="color:#0f0;padding:1rem;height:100%;overflow:auto;font-family:monospace;">${escapeHtml(text)}</pre>`;
+    } else {
+      previewHTML = `<div style="color:#888;text-align:center;padding:2rem;">Binary content (${mimeClean})<br><br><a href="${url}" download="content.bin" style="color:var(--accent);text-decoration:underline;">⬇ Download file</a></div>`;
+    }
+    previewBox.innerHTML = previewHTML;
+
+  } catch (err) {
+    previewBox.innerHTML = `<div style="color:#ff3366;padding:2rem;">Failed to load content<br><small>${err.message}</small></div>`;
+    mimeInfo.textContent = "Unknown";
+    sizeInfo.textContent = "Unknown";
+    console.error("Download error:", err);
+  }
+
+  popup.addEventListener("click", e => {
+    if (e.target === popup) popup.remove();
+  });
+}
+
+// Refresh feed
+async function refreshFeed() {
+  const main = document.getElementById("main");
+  main.innerHTML = '<div class="loading">Discovering latest content…</div>';
+  let all = [];
+  for (const cat in INDEXERS) {
+    const memos = await fetchIndexerMemos(INDEXERS[cat]);
+    all.push(...memos.map(m => ({...m, category: cat})));
+  }
+  const unique = new Map();
+  all.forEach(m => {
+    const key = `${m.uploader}#${m.index}`;
+    if (!unique.has(key)) unique.set(key, m);
+  });
+  all = Array.from(unique.values()).sort((a,b) => new Date(b.time) - new Date(a.time));
+  main.innerHTML = "";
+  if (all.length === 0) {
+    main.innerHTML = '<div class="empty">No recent content found yet.</div>';
+    return;
+  }
+  all.forEach(item => main.appendChild(renderItem(item)));
+}
+
+// Start
+document.addEventListener("DOMContentLoaded", () => {
+  refreshFeed();
+  setInterval(refreshFeed, UPDATE_INTERVAL);
+});
+</script>
+</body>
+</html>
