@@ -603,7 +603,7 @@ def upload(inp: bytes, fr0g_secret: str, index: int | str = 0, make_discoverable
     if make_discoverable:
        indexer_id=get_indexerID_from_mimetype(mime_type)
        print("guessed category id: "+indexer_id)
-       send_text_memo(str(target_index),fr0gID2stellar(indexer_id),fr0gsecret2stellar(fr0g_secret),0)
+       send_text_memo(str(target_index),fr0gID2stellar(indexer_id),fr0gsecret2stellar(fr0g_secret))
 ###############################################
     return all_ids
 def get_mime_type(fr0g_id: str, file_index: int = 0) -> Optional[str]:
@@ -899,8 +899,8 @@ def get_c(id: str, index: int = 0):
             print(colors.RED + f"Gzip decompress failed: {e}" + colors.END)
             return None, None
     return full, mime_clean
-def send_text_memo(mytext: str, address_to: str, secret_from: str, amount: float = 0):
-    print("Make your content discoverable for others on the Fr0gNet...")
+def send_text_memo(mytext: str, address_to: str, secret_from: str, amount: float = 0.0000001):
+    print("Making your content discoverable for others on the Fr0gNet...")
     if len(mytext.encode("utf-8")) > 28:
         pass
     stellar_from_secret = secret_from
@@ -921,5 +921,7 @@ def send_text_memo(mytext: str, address_to: str, secret_from: str, amount: float
     else:
         tx = append_set_options_op(tx)
     tx = sign_transaction(tx, stellar_from_secret)
-    submit_transaction(tx)
+    tx=submit_transaction(tx)
     print(colors.GREEN + "Success!" + colors.END)
+
+    print(tx)
